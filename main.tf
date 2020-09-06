@@ -12,7 +12,7 @@ module "resource-group" {
   source  = "anugnes/resource-group/azure"
   version = "0.1.0"
   name = "azure-tf-rg"
-  tags = "production"
+  tags = "Test"
   location = "westeurope"
 }
 
