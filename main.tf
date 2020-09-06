@@ -8,7 +8,15 @@ terraform {
   }
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "myTFResourceGroup"
+module "resource-group" {
+  source  = "anugnes/resource-group/azure"
+  version = "0.1.0"
+  name = "azure-tf-rg"
+  tags = "production"
   location = "westeurope"
 }
+
+#resource "azurerm_resource_group" "rg" {
+#  name     = "myTFResourceGroup"
+#  location = "westeurope"
+#}
