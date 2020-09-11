@@ -1,7 +1,20 @@
-resource "azurerm_network_security_group" "mgmt" {
-  name                = "azure-tf-mgmt-rg"
+resource "azurerm_network_security_group" "bastion" {
+  name                = "{azurerm_resource_group.mgmt.name}-bastion-nsg"
   location            = azurerm_resource_group.mgmt.location
   resource_group_name = azurerm_resource_group.mgmt.name
+
+  security_rule {
+    name                       = "allow-ssh"
+    description                = "Allow SSH"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "Internet"
+    destination_address_prefix = "*"
+  }
 }
 
 resource "azurerm_network_ddos_protection_plan" "mgmt" {
@@ -22,23 +35,20 @@ resource "azurerm_virtual_network" "mgmt" {
     enable = false
   }
 
-  subnet {
-    name           = "subnet-bastion"
-    address_prefix = "10.0.1.0/24"
-    security_group = azurerm_network_security_group.mgmt.id
-  }
-
-#  subnet {
-#    name           = "subnet2"
-#    address_prefix = "10.0.2.0/24"
- # }
-
-#  subnet {
-#    name           = "subnet3"
-#    address_prefix = "10.0.3.0/24"
-#  }
-
+  
   tags = {
     environment = "mgmt"
   }
+}
+
+resource "azurerm_subnet" "bastion" {
+  name                 = "subnet-bastion"
+  resource_group_name  = azurerm_resource_group.mgmt.name
+  virtual_network_name = azurerm_virtual_network.mgmt.name
+  address_prefix       = "10.0.1.0/24" 
+}
+
+resource "azurerm_subnet_network_security_group_association" "bastion" {
+  subnet_id                 = azurerm_subnet.bastion.id
+  network_security_group_id = azurerm_network_security_group.bastion.id
 }
