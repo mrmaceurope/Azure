@@ -8,10 +8,10 @@ terraform {
   }
 }
 
-module "resource-group" {
-  source  = "anugnes/resource-group/azure"
-  #version = "0.1.0"
-  name = "azure-tf-mgmt-rg"
-  tags = "management"
-  location = "westeurope"
+resource "azurerm_resource_group" "mgmt" {
+  name      = "azure-tf-mgmt-rg"
+  location  = "West Europe"
+  tags      = {
+    environment = "management"
+  }
 }
