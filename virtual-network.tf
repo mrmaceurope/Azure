@@ -1,9 +1,5 @@
 # Defines all network related services
 #
-# First it creates the following Virtual Network
-#
-# - virtualnetwork-mgmt - 10.0.0.0/16
-
 
 # Defines a DDOS plan, that so we can disable it when creating the Virtual Network.
 resource "azurerm_network_ddos_protection_plan" "mgmt" {
@@ -12,7 +8,7 @@ resource "azurerm_network_ddos_protection_plan" "mgmt" {
   resource_group_name = azurerm_resource_group.mgmt.name
 }
 
-# Defines the Virtual Network refered to as 'mgmt'.
+# Defines the, main, Virtual Network refered to as 'mgmt'.
 resource "azurerm_virtual_network" "mgmt" {
   name                = "VirtualNetwork-mgmt"
   location            = azurerm_resource_group.mgmt.location
@@ -35,7 +31,7 @@ resource "azurerm_subnet" "bastion" {
   name                 = "subnet-bastion"
   resource_group_name  = azurerm_resource_group.mgmt.name
   virtual_network_name = azurerm_virtual_network.mgmt.name
-  address_prefix       = "10.0.1.0/24" 
+  address_prefix       = "10.0.1.0/24"
 }
 
 
@@ -64,6 +60,7 @@ resource "azurerm_network_security_group" "bastion" {
   }
 }
 
+# Binding the NSG with the correct subnet(s)
 resource "azurerm_subnet_network_security_group_association" "bastion" {
   subnet_id                 = azurerm_subnet.bastion.id
   network_security_group_id = azurerm_network_security_group.bastion.id

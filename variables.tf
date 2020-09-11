@@ -17,3 +17,11 @@ variable azure_client_secret {
 variable resouces_tags {
     type = map
 }
+
+variable server_username {
+    type = string
+}
+
+variable server_password {
+    type = string
+}

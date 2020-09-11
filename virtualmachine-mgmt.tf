@@ -1,14 +1,7 @@
 # Bulding the virtual machines used wihtin management. 
-# 
-# This TF module builds:
-#
-# - 1 x network interface for the bastion virtual machine, including ip configuation 
-#   where internal private IP are configured as DHCP and Public Internet address are 
-#   assigned based on the public IP address which already have been configured in the 
-#   network module.
-# - 1 x bastion virtual machine, the bastion server
-# - 
+ 
 
+# Building the bastion server
 resource "azurerm_virtual_machine" "mgmt" {
   name                  = "jumphost1"
   location              = azurerm_resource_group.mgmt.location
@@ -36,8 +29,8 @@ resource "azurerm_virtual_machine" "mgmt" {
   }
   os_profile {
     computer_name  = "jumphost01"
-    admin_username = "maint"
-    admin_password = "Password1234!"
+    admin_username = var.server_username
+    admin_password = var.server_password
   }
   os_profile_linux_config {
     disable_password_authentication = false
