@@ -1,7 +1,7 @@
 # Azure
 This is my first test repo on GitHub
 
-##First official release of the Terraform based deployment, of my training on Azure.
+## First official release of the Terraform based deployment, of my training on Azure.
 
 - Resource Group
 - Virtual Network and subnet for management
