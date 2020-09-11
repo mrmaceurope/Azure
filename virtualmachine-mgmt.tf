@@ -1,16 +1,13 @@
-resource "azurerm_network_interface" "bastion" {
-  name                      = "nic"
-  location                  = azurerm_resource_group.mgmt.location
-  resource_group_name       = azurerm_resource_group.mgmt.name
-  #network_security_group_id = azurerm_network_security_group.bastion.id
-
-  ip_configuration {
-    name                          = "testconfiguration1"
-    subnet_id                     = azurerm_subnet.bastion.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.bastion.id
-  }
-}
+# Bulding the virtual machines used wihtin management. 
+# 
+# This TF module builds:
+#
+# - 1 x network interface for the bastion virtual machine, including ip configuation 
+#   where internal private IP are configured as DHCP and Public Internet address are 
+#   assigned based on the public IP address which already have been configured in the 
+#   network module.
+# - 1 x bastion virtual machine, the bastion server
+# - 
 
 resource "azurerm_virtual_machine" "mgmt" {
   name                  = "jumphost1"
@@ -46,6 +43,20 @@ resource "azurerm_virtual_machine" "mgmt" {
     disable_password_authentication = false
   }
   tags = var.resouces_tags
+}
+
+resource "azurerm_network_interface" "bastion" {
+  name                      = "nic"
+  location                  = azurerm_resource_group.mgmt.location
+  resource_group_name       = azurerm_resource_group.mgmt.name
+  
+
+  ip_configuration {
+    name                          = "testconfiguration1"
+    subnet_id                     = azurerm_subnet.bastion.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.bastion.id
+  }
 }
 
 resource "azurerm_public_ip" "bastion" {
