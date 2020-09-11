@@ -2,12 +2,14 @@
  
 
 # Building the bastion server
+# 
+# BUILDING - JUMPHOST1
 resource "azurerm_virtual_machine" "mgmt" {
   name                  = "jumphost1"
   location              = azurerm_resource_group.mgmt.location
   resource_group_name   = azurerm_resource_group.mgmt.name
   network_interface_ids = [azurerm_network_interface.bastion.id]
-  vm_size               = "Standard_DS1_v2"
+  vm_size               = "Standard_B1s"
 
   # Uncomment this line to delete the OS disk automatically when deleting the VM
   delete_os_disk_on_termination = true
@@ -18,7 +20,7 @@ resource "azurerm_virtual_machine" "mgmt" {
   storage_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
+    sku       = "18.04-LTS"
     version   = "latest"
   }
   storage_os_disk {
@@ -39,7 +41,7 @@ resource "azurerm_virtual_machine" "mgmt" {
 }
 
 resource "azurerm_network_interface" "bastion" {
-  name                      = "nic"
+  name                      = "jumphost1-nic"
   location                  = azurerm_resource_group.mgmt.location
   resource_group_name       = azurerm_resource_group.mgmt.name
   
@@ -57,4 +59,17 @@ resource "azurerm_public_ip" "bastion" {
   location            = azurerm_resource_group.mgmt.location
   resource_group_name = azurerm_resource_group.mgmt.name
   allocation_method   = "Dynamic"
+}
+
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "bastion" {
+  virtual_machine_id = azurerm_virtual_machine.mgmt.id
+  location           = azurerm_resource_group.mgmt.location
+  enabled            = true
+
+  daily_recurrence_time = "1900"
+  timezone              = "Romance Standard Time"
+
+  notification_settings {
+    enabled         = false       
+  }
 }
