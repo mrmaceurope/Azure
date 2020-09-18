@@ -1,11 +1,10 @@
 # Bulding the virtual machines used wihtin management. 
- 
 
 # Building the bastion server
 # 
-# BUILDING - JUMPHOST1
-resource "azurerm_virtual_machine" "mgmt" {
-  name                  = "jumphost1"
+# BUILDING - JUMPHOST2
+resource "azurerm_virtual_machine" "bastion2" {
+  name                  = "jumphost2"
   location              = azurerm_resource_group.mgmt.location
   resource_group_name   = azurerm_resource_group.mgmt.name
   network_interface_ids = [azurerm_network_interface.bastion.id]
@@ -18,9 +17,9 @@ resource "azurerm_virtual_machine" "mgmt" {
   delete_data_disks_on_termination = true
 
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
     version   = "latest"
   }
   storage_os_disk {
@@ -30,7 +29,7 @@ resource "azurerm_virtual_machine" "mgmt" {
     managed_disk_type = "Standard_LRS"
   }
   os_profile {
-    computer_name  = "jumphost01"
+    computer_name  = "jumphost02"
     admin_username = var.server_username
     admin_password = var.server_password
   }
@@ -40,36 +39,23 @@ resource "azurerm_virtual_machine" "mgmt" {
   tags = var.resouces_tags
 }
 
-resource "azurerm_network_interface" "bastion" {
-  name                      = "jumphost1-nic"
+resource "azurerm_network_interface" "bastion2" {
+  name                      = "jumphost2-nic"
   location                  = azurerm_resource_group.mgmt.location
   resource_group_name       = azurerm_resource_group.mgmt.name
   
 
   ip_configuration {
-    name                          = "testconfiguration1"
+    name                          = "ipcfg_bastion2"
     subnet_id                     = azurerm_subnet.bastion.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.bastion.id
+    public_ip_address_id          = azurerm_public_ip.bastion2.id
   }
 }
 
-resource "azurerm_public_ip" "bastion" {
+resource "azurerm_public_ip" "bastion2" {
   name                = "bastion-bastionpip"
   location            = azurerm_resource_group.mgmt.location
   resource_group_name = azurerm_resource_group.mgmt.name
   allocation_method   = "Dynamic"
-}
-
-resource "azurerm_dev_test_global_vm_shutdown_schedule" "bastion" {
-  virtual_machine_id = azurerm_virtual_machine.mgmt.id
-  location           = azurerm_resource_group.mgmt.location
-  enabled            = true
-
-  daily_recurrence_time = "1900"
-  timezone              = "Romance Standard Time"
-
-  notification_settings {
-    enabled         = false       
-  }
 }
