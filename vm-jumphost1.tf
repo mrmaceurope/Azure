@@ -1,14 +1,20 @@
 # Bulding the virtual machines used wihtin management. 
- 
+
+# Variables used in this config file
+#
+locals  {
+  vm_computer_name  = "jumphost1"
+}
+
 
 # Building the bastion server
 # 
 # BUILDING - JUMPHOST1
-resource "azurerm_virtual_machine" "mgmt" {
-  name                  = "jumphost1"
+resource "azurerm_virtual_machine" "local.vm_computer_name" {
+  name                  = "local.vm_computer_name"
   location              = azurerm_resource_group.mgmt.location
   resource_group_name   = azurerm_resource_group.mgmt.name
-  network_interface_ids = [azurerm_network_interface.bastion.id]
+  network_interface_ids = [azurerm_network_interface.local.vm_computer_name.id]
   vm_size               = "Standard_B1s"
 
   # Uncomment this line to delete the OS disk automatically when deleting the VM
@@ -30,7 +36,7 @@ resource "azurerm_virtual_machine" "mgmt" {
     managed_disk_type = "Standard_LRS"
   }
   os_profile {
-    computer_name  = "jumphost01"
+    computer_name  = local.vm_computer_name
     admin_username = var.server_username
     admin_password = var.server_password
   }
@@ -41,21 +47,21 @@ resource "azurerm_virtual_machine" "mgmt" {
 }
 
 resource "azurerm_network_interface" "bastion" {
-  name                      = "jumphost1-nic"
+  name                      = [local.vm_computer_name]-nic
   location                  = azurerm_resource_group.mgmt.location
   resource_group_name       = azurerm_resource_group.mgmt.name
   
 
   ip_configuration {
-    name                          = "ipcfg_bastion"
-    subnet_id                     = azurerm_subnet.bastion.id
+    name                          = ipcfg_[local.vm_computer_name]
+    subnet_id                     = azurerm_subnet.local.vm_computer_name.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.bastion.id
+    public_ip_address_id          = azurerm_public_ip.local.vm_computer_name.id
   }
 }
 
-resource "azurerm_public_ip" "bastion" {
-  name                = "bastion-bastionpip"
+resource "azurerm_public_ip" "local.vm_computer_name" {
+  name                = [local.vm_computer_name]-publicip"
   location            = azurerm_resource_group.mgmt.location
   resource_group_name = azurerm_resource_group.mgmt.name
   allocation_method   = "Dynamic"
